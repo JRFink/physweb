@@ -54,14 +54,13 @@
         >{words[current]}</span>
       </span>
     </div>
-    <div class="ticker-line"></div>
   </div>
 </main>
 
 <style>
   :global(*, *::before, *::after) { box-sizing: border-box; margin: 0; padding: 0; }
   :global(body) {
-    background: #dcf7ee;
+    background: #edf6f3;
     font-family: 'DM Mono', monospace;
   }
 
@@ -163,12 +162,5 @@
     60%  { transform: translateY(8%);    opacity: 1; }
     80%  { transform: translateY(-3%);   opacity: 1; }
     100% { transform: translateY(0);     opacity: 1; }
-  }
-
-  .ticker-line {
-    width: 48px;
-    height: 1px;
-    background: #1a7a4a;
-    opacity: 0.4;
   }
 </style>
