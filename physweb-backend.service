@@ -1,0 +1,14 @@
+[Unit]
+Description=physweb Rust backend
+After=network.target
+ 
+[Service]
+User=ubuntu
+WorkingDirectory=/var/www/physweb/backend
+ExecStart=/var/www/physweb/backend/target/release/physweb
+Restart=on-failure
+RestartSec=5
+Environment=RUST_LOG=physweb=info,tower_http=info
+ 
+[Install]
+WantedBy=multi-user.target

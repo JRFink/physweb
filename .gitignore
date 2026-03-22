@@ -1,0 +1,11 @@
+# Rust
+backend/target/
+ 
+# SvelteKit
+frontend/.svelte-kit/
+frontend/build/
+frontend/node_modules/
+ 
+# Misc
+.env
+*.env.local

@@ -1,0 +1,31 @@
+name: Deploy physweb
+ 
+on:
+  push:
+    branches: [main]
+ 
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+ 
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+ 
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PHYSWEB_HOST }}
+          username: ubuntu
+          key: ${{ secrets.PHYSWEB_SSH_KEY }}
+          script: |
+            cd /var/www/physweb
+            git pull origin main
+            cd frontend && npm ci && npm run build
+            cd ../backend && cargo build --release
+            sudo systemctl restart physweb-backend
+            sudo systemctl restart physweb-frontend
