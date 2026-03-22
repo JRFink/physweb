@@ -161,3 +161,5 @@
     position: relative;
     vertical-align: middle;
   }
+
+  </style>
