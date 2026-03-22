@@ -76,7 +76,7 @@
 <style>
   :global(*, *::before, *::after) { box-sizing: border-box; margin: 0; padding: 0; }
   :global(body) {
-    background: #0a0d0f;
+    background: #dcf7ee;
     color: #c8d8c0;
     font-family: 'DM Mono', monospace;
   }
