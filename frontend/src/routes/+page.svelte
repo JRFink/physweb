@@ -10,7 +10,7 @@
 
   function measureWords() {
     const span = document.createElement('span');
-    span.style.cssText = `font-family: 'DM Mono', monospace; font-size: clamp(1.4rem, 4vw, 2.2rem); font-weight: 500; white-space: nowrap; position: absolute; visibility: hidden; line-height: 1;`;
+    span.style.cssText = `font-family: 'DM Mono', monospace; font-size: clamp(1rem, 5vw, 2.2rem); font-weight: 300; white-space: nowrap; position: absolute; visibility: hidden; line-height: 1.4;`;
     document.body.appendChild(span);
     let maxW = 0;
     words.forEach(w => { span.textContent = w; maxW = Math.max(maxW, span.offsetWidth); });
@@ -33,7 +33,7 @@
       // Instant jump: place next word above the wrapper
       trackEl.style.transition = 'none';
       trackEl.style.transform = `translateY(${-next * wordH - wordH * 1.5}px)`;
-      trackEl.getBoundingClientRect(); // force reflow
+      trackEl.getBoundingClientRect();
 
       // Phase 2: enter — slide down, overshoot past center
       const targetY = -(next * wordH);
@@ -55,7 +55,6 @@
 
   onMount(() => {
     measureWords();
-    // Set initial position to show first word
     if (trackEl) {
       trackEl.style.transition = 'none';
       trackEl.style.transform = 'translateY(0px)';
@@ -103,6 +102,7 @@
     justify-content: center;
     position: relative;
     overflow: hidden;
+    padding: 2rem 1.5rem;
   }
 
   .grid-bg {
@@ -135,31 +135,59 @@
     flex-direction: column;
     align-items: center;
     gap: 2rem;
+    width: 100%;
+    max-width: 100%;
   }
 
   .headline {
     display: flex;
     align-items: center;
     flex-wrap: nowrap;
+    max-width: 100%;
   }
 
   .static-text {
-    font-size: clamp(1.4rem, 4vw, 2.2rem);
+    font-size: clamp(1rem, 5vw, 2.2rem);
     font-weight: 300;
     color: #6a8f7a;
     white-space: nowrap;
     letter-spacing: -0.01em;
-    line-height: 1;
+    line-height: 1.4;
+    flex-shrink: 0;
   }
 
   .cryptex-wrapper {
     display: inline-block;
     overflow: hidden;
-    /* height matches exactly one word — set by the word's own line-height */
-    height: 1em;
-    line-height: 1;
+    /* extra vertical padding so descenders (g, y, p) don't get clipped */
+    height: 1.4em;
+    line-height: 1.4;
     position: relative;
     vertical-align: middle;
+    flex-shrink: 0;
   }
 
-  </style>
+  .cryptex-track {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cryptex-word {
+    font-size: clamp(1rem, 5vw, 2.2rem);
+    font-weight: 300;
+    color: #1a7a4a;
+    white-space: nowrap;
+    line-height: 1.4;
+    height: 1.4em;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+  }
+
+  .ticker-line {
+    width: 48px;
+    height: 1px;
+    background: #1a7a4a;
+    opacity: 0.4;
+  }
+</style>
