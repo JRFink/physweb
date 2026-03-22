@@ -2,69 +2,26 @@
   import { onMount } from 'svelte';
 
   const words = ['students', 'researchers', 'ai models', 'engineers'];
-  let trackEl;
-  let wrapperEl;
-  let isAnimating = false;
-  let wrapperWidth = 0;
   let current = 0;
+  let next = 1;
+  let phase = 'idle'; // idle | exit | enter
 
-  function measureWords() {
-    const span = document.createElement('span');
-    span.style.cssText = `font-family: 'DM Mono', monospace; font-size: clamp(1rem, 5vw, 2.2rem); font-weight: 300; white-space: nowrap; position: absolute; visibility: hidden; line-height: 1.4;`;
-    document.body.appendChild(span);
-    let maxW = 0;
-    words.forEach(w => { span.textContent = w; maxW = Math.max(maxW, span.offsetWidth); });
-    document.body.removeChild(span);
-    wrapperWidth = maxW + 4;
-  }
-
-  function animateNext() {
-    if (isAnimating || !trackEl || !wrapperEl) return;
-    isAnimating = true;
-
-    const next = (current + 1) % words.length;
-    const wordH = wrapperEl.offsetHeight;
-
-    // Phase 1: exit — current word slides down and out
-    trackEl.style.transition = 'transform 0.28s cubic-bezier(0.4, 0, 1, 1)';
-    trackEl.style.transform = `translateY(${wordH * 1.5}px)`;
+  function tick() {
+    next = (current + 1) % words.length;
+    phase = 'exit';
 
     setTimeout(() => {
-      // Instant jump: place next word above the wrapper
-      trackEl.style.transition = 'none';
-      trackEl.style.transform = `translateY(${-next * wordH - wordH * 1.5}px)`;
-      trackEl.getBoundingClientRect();
-
-      // Phase 2: enter — slide down, overshoot past center
-      const targetY = -(next * wordH);
-      trackEl.style.transition = 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)';
-      trackEl.style.transform = `translateY(${targetY + wordH * 0.1}px)`;
-
+      current = next;
+      phase = 'enter';
       setTimeout(() => {
-        // Phase 3: snap back up into exact position
-        trackEl.style.transition = 'transform 0.15s cubic-bezier(0.34, 1.7, 0.64, 1)';
-        trackEl.style.transform = `translateY(${targetY}px)`;
-
-        setTimeout(() => {
-          current = next;
-          isAnimating = false;
-        }, 180);
-      }, 320);
-    }, 300);
+        phase = 'idle';
+      }, 450);
+    }, 350);
   }
 
   onMount(() => {
-    measureWords();
-    if (trackEl) {
-      trackEl.style.transition = 'none';
-      trackEl.style.transform = 'translateY(0px)';
-    }
-    window.addEventListener('resize', measureWords);
-    const interval = setInterval(animateNext, 2600);
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('resize', measureWords);
-    };
+    const interval = setInterval(tick, 2600);
+    return () => clearInterval(interval);
   });
 </script>
 
@@ -75,15 +32,12 @@
   <div class="content">
     <div class="headline">
       <span class="static-text">Physics data for&nbsp;</span>
-      <div class="cryptex-wrapper" bind:this={wrapperEl} style="width: {wrapperWidth}px">
-        <div class="cryptex-track" bind:this={trackEl}>
-          {#each words as word}
-            <div class="cryptex-word">{word}</div>
-          {/each}
-        </div>
-      </div>
+      <span
+        class="cryptex-word"
+        class:exit={phase === 'exit'}
+        class:enter={phase === 'enter'}
+      >{words[current]}</span>
     </div>
-
     <div class="ticker-line"></div>
   </div>
 </main>
@@ -91,7 +45,7 @@
 <style>
   :global(*, *::before, *::after) { box-sizing: border-box; margin: 0; padding: 0; }
   :global(body) {
-    background: #dcf7ee;
+    background: #ecf6f3;
     font-family: 'DM Mono', monospace;
   }
 
@@ -136,14 +90,14 @@
     align-items: center;
     gap: 2rem;
     width: 100%;
-    max-width: 100%;
   }
 
   .headline {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     flex-wrap: nowrap;
     max-width: 100%;
+    overflow: hidden;
   }
 
   .static-text {
@@ -152,24 +106,7 @@
     color: #6a8f7a;
     white-space: nowrap;
     letter-spacing: -0.01em;
-    line-height: 1.4;
     flex-shrink: 0;
-  }
-
-  .cryptex-wrapper {
-    display: inline-block;
-    overflow: hidden;
-    /* extra vertical padding so descenders (g, y, p) don't get clipped */
-    height: 1.4em;
-    line-height: 1.4;
-    position: relative;
-    vertical-align: middle;
-    flex-shrink: 0;
-  }
-
-  .cryptex-track {
-    display: flex;
-    flex-direction: column;
   }
 
   .cryptex-word {
@@ -177,11 +114,33 @@
     font-weight: 300;
     color: #1a7a4a;
     white-space: nowrap;
-    line-height: 1.4;
-    height: 1.4em;
     letter-spacing: -0.01em;
-    display: flex;
-    align-items: center;
+    display: inline-block;
+    /* default: visible, in place */
+    transform: translateY(0);
+    opacity: 1;
+    transition: none;
+  }
+
+  /* Exit: word drops down and fades out */
+  .cryptex-word.exit {
+    transform: translateY(120%);
+    opacity: 0;
+    transition:
+      transform 0.32s cubic-bezier(0.4, 0, 1, 0.6),
+      opacity 0.25s ease;
+  }
+
+  /* Enter: word comes from above, overshoots, snaps into baseline */
+  .cryptex-word.enter {
+    animation: enterWord 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes enterWord {
+    0%   { transform: translateY(-130%); opacity: 0; }
+    60%  { transform: translateY(8%);    opacity: 1; }
+    80%  { transform: translateY(-3%);   opacity: 1; }
+    100% { transform: translateY(0);     opacity: 1; }
   }
 
   .ticker-line {
