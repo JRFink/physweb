@@ -2,11 +2,11 @@
   import { onMount } from 'svelte';
  
   const words = ['students', 'researchers', 'ai models', 'engineers'];
-  let current = 0;
   let trackEl;
   let wrapperEl;
   let isAnimating = false;
   let wrapperWidth = 0;
+  let current = 0;
  
   function measureWords() {
     const span = document.createElement('span');
@@ -21,19 +21,34 @@
   function animateNext() {
     if (isAnimating || !trackEl) return;
     isAnimating = true;
+ 
     const next = (current + 1) % words.length;
     const wordH = wrapperEl.offsetHeight;
-    const targetY = -(next * wordH);
-    const overshoot = targetY - wordH * 0.28;
  
-    trackEl.style.transition = `transform 0.38s cubic-bezier(0.32, 0, 0.67, 0)`;
+    // Always scroll downward: next word starts below, moves up into view
+    // Position track so next word is just below the visible window
+    trackEl.style.transition = 'none';
+    trackEl.style.transform = `translateY(${-current * wordH + wordH}px)`;
+ 
+    // Force reflow so the jump registers before we animate
+    trackEl.getBoundingClientRect();
+ 
+    // Phase 1: slide up, overshoot slightly past target
+    const targetY = -(next * wordH);
+    const overshoot = targetY - wordH * 0.12;
+ 
+    trackEl.style.transition = 'transform 0.35s cubic-bezier(0.32, 0, 0.67, 0)';
     trackEl.style.transform = `translateY(${overshoot}px)`;
  
     setTimeout(() => {
-      trackEl.style.transition = `transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)`;
+      // Phase 2: elastic snap back to exact position
+      trackEl.style.transition = 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
       trackEl.style.transform = `translateY(${targetY}px)`;
-      setTimeout(() => { current = next; isAnimating = false; }, 240);
-    }, 390);
+      setTimeout(() => {
+        current = next;
+        isAnimating = false;
+      }, 220);
+    }, 360);
   }
  
   onMount(() => {
@@ -52,7 +67,6 @@
   <div class="scanlines"></div>
  
   <div class="content">
- 
     <div class="headline">
       <span class="static-text">Physics data for</span>
       <div
@@ -69,7 +83,6 @@
     </div>
  
     <div class="ticker-line"></div>
-    <span class="sub">[ initializing data streams ]</span>
   </div>
 </main>
  
@@ -122,14 +135,6 @@
     gap: 2.5rem;
   }
  
-  .label {
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: 0.25em;
-    color: #4a7c55;
-    text-transform: uppercase;
-  }
- 
   .headline {
     display: flex;
     align-items: center;
@@ -151,24 +156,6 @@
     position: relative;
     vertical-align: middle;
     margin-left: 0.25em;
-  }
- 
-  .cryptex-wrapper::before,
-  .cryptex-wrapper::after {
-    content: '';
-    position: absolute;
-    left: 0; right: 0;
-    height: 30%;
-    z-index: 2;
-    pointer-events: none;
-  }
-  .cryptex-wrapper::before {
-    top: 0;
-    background: linear-gradient(to bottom, #0a0d0f 0%, transparent 100%);
-  }
-  .cryptex-wrapper::after {
-    bottom: 0;
-    background: linear-gradient(to top, #0a0d0f 0%, transparent 100%);
   }
  
   .cryptex-track {
@@ -194,11 +181,5 @@
     height: 1px;
     background: #52d98a;
     opacity: 0.35;
-  }
- 
-  .sub {
-    font-size: 12px;
-    color: #3a5a42;
-    letter-spacing: 0.15em;
   }
 </style>
