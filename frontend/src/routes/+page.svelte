@@ -3,25 +3,36 @@
 
   const words = ['students', 'researchers', 'ai models', 'engineers'];
   let current = 0;
-  let next = 1;
-  let phase = 'idle'; // idle | exit | enter
+  let phase = 'idle';
+  let wordSlotWidth = 0;
+
+  function measureMaxWidth() {
+    const span = document.createElement('span');
+    span.style.cssText = `font-family: 'DM Mono', monospace; font-size: clamp(1rem, 5vw, 2.2rem); font-weight: 300; white-space: nowrap; position: absolute; visibility: hidden;`;
+    document.body.appendChild(span);
+    let maxW = 0;
+    words.forEach(w => { span.textContent = w; maxW = Math.max(maxW, span.offsetWidth); });
+    document.body.removeChild(span);
+    wordSlotWidth = maxW;
+  }
 
   function tick() {
-    next = (current + 1) % words.length;
     phase = 'exit';
-
     setTimeout(() => {
-      current = next;
+      current = (current + 1) % words.length;
       phase = 'enter';
-      setTimeout(() => {
-        phase = 'idle';
-      }, 450);
+      setTimeout(() => { phase = 'idle'; }, 450);
     }, 350);
   }
 
   onMount(() => {
+    measureMaxWidth();
+    window.addEventListener('resize', measureMaxWidth);
     const interval = setInterval(tick, 2600);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('resize', measureMaxWidth);
+    };
   });
 </script>
 
@@ -33,10 +44,15 @@
     <div class="headline">
       <span class="static-text">Physics data for&nbsp;</span>
       <span
-        class="cryptex-word"
-        class:exit={phase === 'exit'}
-        class:enter={phase === 'enter'}
-      >{words[current]}</span>
+        class="cryptex-slot"
+        style="width: {wordSlotWidth}px"
+      >
+        <span
+          class="cryptex-word"
+          class:exit={phase === 'exit'}
+          class:enter={phase === 'enter'}
+        >{words[current]}</span>
+      </span>
     </div>
     <div class="ticker-line"></div>
   </div>
@@ -45,7 +61,7 @@
 <style>
   :global(*, *::before, *::after) { box-sizing: border-box; margin: 0; padding: 0; }
   :global(body) {
-    background: #ecf6f3;
+    background: #dcf7ee;
     font-family: 'DM Mono', monospace;
   }
 
@@ -109,6 +125,15 @@
     flex-shrink: 0;
   }
 
+  /* Fixed-width slot — always the width of the longest word */
+  .cryptex-slot {
+    display: inline-block;
+    overflow: hidden;
+    flex-shrink: 0;
+    /* clip words that animate outside the slot */
+    clip-path: inset(-50% 0 -50% 0);
+  }
+
   .cryptex-word {
     font-size: clamp(1rem, 5vw, 2.2rem);
     font-weight: 300;
@@ -116,13 +141,11 @@
     white-space: nowrap;
     letter-spacing: -0.01em;
     display: inline-block;
-    /* default: visible, in place */
     transform: translateY(0);
     opacity: 1;
     transition: none;
   }
 
-  /* Exit: word drops down and fades out */
   .cryptex-word.exit {
     transform: translateY(120%);
     opacity: 0;
@@ -131,7 +154,6 @@
       opacity 0.25s ease;
   }
 
-  /* Enter: word comes from above, overshoots, snaps into baseline */
   .cryptex-word.enter {
     animation: enterWord 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
