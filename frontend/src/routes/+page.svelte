@@ -107,8 +107,8 @@
       0deg,
       transparent,
       transparent 3px,
-      rgba(0,255,100,0.012) 3px,
-      rgba(0,255,100,0.012) 4px
+      rgba(207, 222, 213, 0.012) 3px,
+      rgba(197, 206, 240, 0.012) 4px
     );
     pointer-events: none;
   }
