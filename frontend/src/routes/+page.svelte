@@ -1,13 +1,13 @@
 <script>
   import { onMount } from 'svelte';
- 
+
   const words = ['students', 'researchers', 'ai models', 'engineers'];
   let trackEl;
   let wrapperEl;
   let isAnimating = false;
   let wrapperWidth = 0;
   let current = 0;
- 
+
   function measureWords() {
     const span = document.createElement('span');
     span.style.cssText = `font-family: 'DM Mono', monospace; font-size: clamp(1.4rem, 4vw, 2.2rem); font-weight: 500; white-space: nowrap; position: absolute; visibility: hidden; line-height: 1;`;
@@ -17,34 +17,34 @@
     document.body.removeChild(span);
     wrapperWidth = maxW + 4;
   }
- 
+
   function animateNext() {
     if (isAnimating || !trackEl || !wrapperEl) return;
     isAnimating = true;
- 
+
     const next = (current + 1) % words.length;
     const wordH = wrapperEl.offsetHeight;
- 
+
     // Phase 1: exit — current word slides down and out
     trackEl.style.transition = 'transform 0.28s cubic-bezier(0.4, 0, 1, 1)';
     trackEl.style.transform = `translateY(${wordH * 1.5}px)`;
- 
+
     setTimeout(() => {
       // Instant jump: place next word above the wrapper
       trackEl.style.transition = 'none';
       trackEl.style.transform = `translateY(${-next * wordH - wordH * 1.5}px)`;
       trackEl.getBoundingClientRect(); // force reflow
- 
+
       // Phase 2: enter — slide down, overshoot past center
       const targetY = -(next * wordH);
       trackEl.style.transition = 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)';
       trackEl.style.transform = `translateY(${targetY + wordH * 0.1}px)`;
- 
+
       setTimeout(() => {
         // Phase 3: snap back up into exact position
         trackEl.style.transition = 'transform 0.15s cubic-bezier(0.34, 1.7, 0.64, 1)';
         trackEl.style.transform = `translateY(${targetY}px)`;
- 
+
         setTimeout(() => {
           current = next;
           isAnimating = false;
@@ -52,7 +52,7 @@
       }, 320);
     }, 300);
   }
- 
+
   onMount(() => {
     measureWords();
     // Set initial position to show first word
@@ -68,11 +68,11 @@
     };
   });
 </script>
- 
+
 <main>
   <div class="grid-bg"></div>
   <div class="scanlines"></div>
- 
+
   <div class="content">
     <div class="headline">
       <span class="static-text">Physics data for&nbsp;</span>
@@ -84,18 +84,18 @@
         </div>
       </div>
     </div>
- 
+
     <div class="ticker-line"></div>
   </div>
 </main>
- 
+
 <style>
   :global(*, *::before, *::after) { box-sizing: border-box; margin: 0; padding: 0; }
   :global(body) {
     background: #dcf7ee;
     font-family: 'DM Mono', monospace;
   }
- 
+
   main {
     min-height: 100vh;
     display: flex;
@@ -104,7 +104,7 @@
     position: relative;
     overflow: hidden;
   }
- 
+
   .grid-bg {
     position: absolute;
     inset: 0;
@@ -114,7 +114,7 @@
     background-size: 40px 40px;
     pointer-events: none;
   }
- 
+
   .scanlines {
     position: absolute;
     inset: 0;
@@ -127,7 +127,7 @@
     );
     pointer-events: none;
   }
- 
+
   .content {
     position: relative;
     z-index: 1;
@@ -136,13 +136,13 @@
     align-items: center;
     gap: 2rem;
   }
- 
+
   .headline {
     display: flex;
     align-items: center;
     flex-wrap: nowrap;
   }
- 
+
   .static-text {
     font-size: clamp(1.4rem, 4vw, 2.2rem);
     font-weight: 300;
@@ -151,7 +151,7 @@
     letter-spacing: -0.01em;
     line-height: 1;
   }
- 
+
   .cryptex-wrapper {
     display: inline-block;
     overflow: hidden;
@@ -161,28 +161,3 @@
     position: relative;
     vertical-align: middle;
   }
- 
-  .cryptex-track {
-    display: flex;
-    flex-direction: column;
-  }
- 
-  .cryptex-word {
-    font-size: clamp(1.4rem, 4vw, 2.2rem);
-    font-weight: 500;
-    color: #1a7a4a;
-    white-space: nowrap;
-    line-height: 1;
-    height: 1em;
-    letter-spacing: -0.01em;
-    display: flex;
-    align-items: center;
-  }
- 
-  .ticker-line {
-    width: 48px;
-    height: 1px;
-    background: #1a7a4a;
-    opacity: 0.4;
-  }
-</style>
