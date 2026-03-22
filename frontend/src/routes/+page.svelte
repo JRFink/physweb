@@ -72,11 +72,6 @@
         >{words[current]}</span>
       </span>
     </div>
-
-    <div class="scroll-hint">
-      <span>scroll</span>
-      <div class="scroll-arrow"></div>
-    </div>
   </div>
 </section>
 
@@ -93,7 +88,7 @@
   </nav>
 
   <div class="content-body">
-    <h2 class="section-heading">The physics reference you actually need</h2>
+    <h2 class="section-heading">The physics data you need</h2>
     <p class="section-sub">Precise, citable data for every domain of physics — from fundamental constants to field equations.</p>
 
     <div class="card-grid">
