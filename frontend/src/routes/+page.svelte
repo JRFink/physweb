@@ -37,7 +37,7 @@
   }
 
   onMount(() => {
-    measureMaxWidth();
+    document.fonts.ready.then(measureMaxWidth);
     window.addEventListener('resize', measureMaxWidth);
     window.addEventListener('scroll', onScroll, { passive: true });
     const interval = setInterval(tick, 2600);
