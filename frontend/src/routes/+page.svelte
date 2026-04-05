@@ -17,7 +17,7 @@
     let maxW = 0;
     words.forEach(w => { span.textContent = w; maxW = Math.max(maxW, span.offsetWidth); });
     document.body.removeChild(span);
-    wordSlotWidth = maxW;
+    wordSlotWidth = maxW + 4;
   }
 
   function tick() {
