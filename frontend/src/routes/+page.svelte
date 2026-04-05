@@ -175,7 +175,6 @@
     align-items: baseline;
     flex-wrap: nowrap;
     max-width: 100%;
-    overflow: hidden;
   }
 
   .static-text {
