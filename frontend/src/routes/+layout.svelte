@@ -9,6 +9,35 @@
     { href: '/research', label: 'Research' },
     { href: '/tutoring', label: 'Tutoring' },
   ];
+
+  let newsletterEmail = '';
+  let newsletterState = 'idle'; // 'idle' | 'loading' | 'success' | 'error'
+  let newsletterMsg = '';
+
+  async function handleNewsletter(e) {
+    e.preventDefault();
+    newsletterState = 'loading';
+    newsletterMsg = '';
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newsletterEmail }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        newsletterState = 'success';
+        newsletterMsg = data.message;
+        newsletterEmail = '';
+      } else {
+        newsletterState = 'error';
+        newsletterMsg = data.message;
+      }
+    } catch {
+      newsletterState = 'error';
+      newsletterMsg = 'Something went wrong. Please try again.';
+    }
+  }
 </script>
 
 <nav class="nav">
@@ -50,7 +79,7 @@
     <div class="footer-top">
       <div class="footer-brand">
         <a href="/" class="logo">phys<span class="logo-accent">web</span></a>
-        <p>The complete physics education and research platform.</p>
+        <p>The complete physics learning and research platform.</p>
       </div>
       <div class="footer-cols">
         <div class="footer-col">
@@ -75,6 +104,32 @@
         </div>
       </div>
     </div>
+    <div class="newsletter">
+      <div class="newsletter-text">
+        <h4>Stay in the loop</h4>
+        <p>New modules, research updates, and platform news.</p>
+      </div>
+      {#if newsletterState === 'success'}
+        <div class="newsletter-success">{newsletterMsg}</div>
+      {:else}
+        <form class="newsletter-form" on:submit={handleNewsletter}>
+          <input
+            type="email"
+            placeholder="your@email.com"
+            bind:value={newsletterEmail}
+            required
+            disabled={newsletterState === 'loading'}
+          />
+          <button type="submit" disabled={newsletterState === 'loading'}>
+            {newsletterState === 'loading' ? '…' : 'Subscribe'}
+          </button>
+        </form>
+        {#if newsletterState === 'error'}
+          <p class="newsletter-error">{newsletterMsg}</p>
+        {/if}
+      {/if}
+    </div>
+
     <div class="footer-bottom">
       <span>© 2026 Physweb. All rights reserved.</span>
     </div>
@@ -250,6 +305,94 @@
 
   .footer-col a:hover {
     color: var(--text);
+  }
+
+  .newsletter {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .newsletter-text {
+    flex: 1;
+    min-width: 160px;
+  }
+
+  .newsletter-text h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.2rem;
+  }
+
+  .newsletter-text p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .newsletter-form {
+    display: flex;
+    gap: 0.5rem;
+    flex: 2;
+    min-width: 260px;
+  }
+
+  .newsletter-form input {
+    flex: 1;
+    background: var(--surface-2);
+    border: 1px solid var(--border-bright);
+    border-radius: 8px;
+    padding: 0.55rem 0.85rem;
+    font-size: 0.875rem;
+    color: var(--text);
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+    min-width: 0;
+  }
+
+  .newsletter-form input::placeholder { color: var(--text-muted); }
+
+  .newsletter-form input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(74,158,255,0.1);
+  }
+
+  .newsletter-form button {
+    padding: 0.55rem 1.25rem;
+    background: var(--grad);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+  }
+
+  .newsletter-form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .newsletter-success {
+    font-size: 0.875rem;
+    color: var(--green);
+    flex: 2;
+  }
+
+  .newsletter-error {
+    font-size: 0.78rem;
+    color: #f87171;
+    margin-top: 0.35rem;
+    width: 100%;
   }
 
   .footer-bottom {
