@@ -28,7 +28,7 @@
   <div class="grid-overlay"></div>
 
   <div class="hero-inner container">
-    <div class="badge">Physics Education & Research</div>
+    <div class="badge">Physics Learning & Research</div>
     <h1>Master <span class="gradient-text">Physics</span><br />at Every Level</h1>
     <p class="hero-sub">
       Structured learning modules, frontier research insights, and on-demand expert tutoring —
