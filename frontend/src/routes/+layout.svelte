@@ -115,7 +115,7 @@
         <form class="newsletter-form" on:submit={handleNewsletter}>
           <input
             type="email"
-            placeholder="your@email.com"
+            placeholder="london@mail.com"
             bind:value={newsletterEmail}
             required
             disabled={newsletterState === 'loading'}
