@@ -101,6 +101,7 @@
           <a href="/tutoring">Tutoring</a>
           <a href="/auth/register">Sign Up</a>
           <a href="/auth/login">Log In</a>
+          <a href="/careers">Careers</a>
         </div>
       </div>
     </div>
