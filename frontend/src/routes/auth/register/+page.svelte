@@ -37,7 +37,7 @@
         <input
           id="name"
           type="text"
-          placeholder="Jane Smith"
+          placeholder="London McAlister"
           bind:value={name}
           required
           autocomplete="name"
@@ -49,7 +49,7 @@
         <input
           id="email"
           type="email"
-          placeholder="you@example.com"
+          placeholder="london@mail.com"
           bind:value={email}
           required
           autocomplete="email"
